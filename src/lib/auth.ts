@@ -11,7 +11,13 @@ export type AdminSession = {
 
 const COOKIE_NAME = "rupiya_admin_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
-const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || process.env.DATABASE_URL || "rupiya-dev-secret";
+const SESSION_SECRET =
+  process.env.ADMIN_SESSION_SECRET ||
+  (process.env.NODE_ENV === "production" ? undefined : "rupiya-dev-secret");
+
+if (!SESSION_SECRET) {
+  throw new Error("ADMIN_SESSION_SECRET is required in production");
+}
 
 function sign(value: string) {
   return createHmac("sha256", SESSION_SECRET).update(value).digest("base64url");

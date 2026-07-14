@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export function AdminLoginForm() {
   const router = useRouter();
-  const [form, setForm] = useState({ username: "admin", password: "rupiya123" });
+  const [form, setForm] = useState({ username: "admin", password: "RupiyaAdmin!2026" });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -181,7 +181,7 @@ export async function GET(request: Request) {
     tables,
     nextSteps: [
       tables.length === 0 ? "اجرای POST برای ساخت جداول" : "جداول آماده‌اند",
-      tables.includes("admins") ? "پنل ادمین آماده ورود است (admin / rupiya123)" : "پس از ساخت جداول، حساب ادمین ساخته می‌شود",
+      tables.includes("admins") ? "پنل ادمین آماده ورود است (admin / RupiyaAdmin!2026)" : "پس از ساخت جداول، حساب ادمین ساخته می‌شود",
     ],
   });
 }

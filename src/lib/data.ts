@@ -193,7 +193,7 @@ export type AdminDashboardData = PublicData & {
 
 export const defaultAdminCredentials = {
   username: "admin",
-  password: "rupiya123",
+  password: "RupiyaAdmin!2026",
 };
 
 const globalForSeed = globalThis as typeof globalThis & {
