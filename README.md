@@ -40,7 +40,7 @@
 
 مثال:
 ```
-postgresql://user:password@ep-cool-name-123456.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+postgresql://user:password@ep-cool-name-123456.ap-southeast-1.aws.neon.tech/neondb?sslmode=verify-full
 ```
 
 ### مرحله ۲: آپلود پروژه روی GitHub
@@ -235,7 +235,7 @@ npm run typecheck    # بررسی TypeScript
 مطمئن شوید فایل `.env` وجود دارد و `DATABASE_URL` در آن تنظیم شده است.
 
 ### خطای اتصال به دیتابیس
-- برای Neon، مطمئن شوید آدرس شامل `?sslmode=require` است
+- برای Neon، مطمئن شوید آدرس شامل `?sslmode=verify-full` است
 - کد به‌صورت خودکار SSL را برای دامنه‌های `neon.tech` فعال می‌کند
 
 ### پنل مدیریت لود نمی‌شود
