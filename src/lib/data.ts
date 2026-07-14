@@ -1,4 +1,4 @@
-import { asc, count, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq, sql } from "drizzle-orm";
 import { databaseProviderLabel, db } from "@/db";
 import { admins, categories, menuItems, reservations, siteInfo } from "@/db/schema";
 import { hashPassword } from "@/lib/auth";
@@ -200,12 +200,89 @@ const globalForSeed = globalThis as typeof globalThis & {
   __rupiyaSeedPromise?: Promise<void>;
 };
 
+async function ensureTables() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS categories (
+      id SERIAL PRIMARY KEY,
+      name_fa VARCHAR(255) NOT NULL,
+      name_en VARCHAR(255) NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS menu_items (
+      id SERIAL PRIMARY KEY,
+      category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+      name_fa VARCHAR(255) NOT NULL,
+      name_en VARCHAR(255) NOT NULL,
+      description_fa TEXT NOT NULL,
+      description_en TEXT NOT NULL,
+      price INTEGER NOT NULL,
+      image_url TEXT NOT NULL,
+      is_available BOOLEAN NOT NULL DEFAULT TRUE,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS reservations (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      phone VARCHAR(50) NOT NULL,
+      date VARCHAR(50) NOT NULL,
+      time VARCHAR(50) NOT NULL,
+      guests INTEGER NOT NULL,
+      status VARCHAR(30) NOT NULL DEFAULT 'pending',
+      notes TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS site_info (
+      id SERIAL PRIMARY KEY,
+      hours_fa VARCHAR(255) NOT NULL,
+      hours_en VARCHAR(255) NOT NULL,
+      phone_primary VARCHAR(50) NOT NULL,
+      phone_secondary VARCHAR(50) NOT NULL,
+      address_fa TEXT NOT NULL,
+      address_en TEXT NOT NULL,
+      instagram_url TEXT NOT NULL,
+      instagram_handle VARCHAR(255) NOT NULL,
+      maps_url TEXT NOT NULL,
+      tagline_fa TEXT NOT NULL,
+      tagline_en TEXT NOT NULL,
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS admins (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(255) NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await db.execute(sql`CREATE UNIQUE INDEX IF NOT EXISTS admins_username_idx ON admins (username);`);
+}
+
 export async function ensureSeedData() {
   if (globalForSeed.__rupiyaSeedPromise) {
     return globalForSeed.__rupiyaSeedPromise;
   }
 
   globalForSeed.__rupiyaSeedPromise = (async () => {
+    await ensureTables();
+
     const [{ count: categoryCount }] = await db.select({ count: count() }).from(categories);
 
     if (Number(categoryCount) === 0) {
@@ -264,7 +341,10 @@ export async function ensureSeedData() {
         updatedAt: new Date(),
       });
     }
-  })();
+  })().catch((error) => {
+    globalForSeed.__rupiyaSeedPromise = undefined;
+    throw error;
+  });
 
   return globalForSeed.__rupiyaSeedPromise;
 }
