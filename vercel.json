@@ -7,8 +7,8 @@
   "regions": ["fra1"],
   "build": {
     "env": {
-      "DATABASE_URL": "@database-url",
-      "ADMIN_SESSION_SECRET": "@admin-session-secret"
+      "DATABASE_URL": "postgresql://neondb_owner:npg_6jAziwYNnxa0@ep-dawn-unit-at79ktzw-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+      "ADMIN_SESSION_SECRET": "VoidM79s.@"
     }
   },
   "headers": [
