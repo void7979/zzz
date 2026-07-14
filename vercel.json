@@ -5,6 +5,13 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["fra1"],
+  "build": {
+    "env": {
+      "DATABASE_URL": "postgresql://neondb_owner:npg_6jAziwYNnxa0@ep-dawn-unit-at79ktzw-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
+      "ADMIN_SESSION_SECRET": "0f1185f6f3cf7b25f1b93b98589199cb537f514250317c1868df66e32de9b8df",
+      "SETUP_SECRET": "rupiya-setup-2026-test-7f3b8c1a"
+    }
+  },
   "env": {
     "DATABASE_URL": "postgresql://neondb_owner:npg_6jAziwYNnxa0@ep-dawn-unit-at79ktzw-pooler.c-9.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require",
     "DATABASE_URL_UNPOOLED": "postgresql://neondb_owner:npg_6jAziwYNnxa0@ep-dawn-unit-at79ktzw.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require",
