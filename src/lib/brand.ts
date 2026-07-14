@@ -1,9 +1,9 @@
 export const brandAssets = {
-  logo: "/brand/rupiya-logo.png",
-  hero: "/images/rupiya-interior-hero.jpg",
-  seating: "/images/rupiya-interior-seating.jpg",
-  wide: "/images/rupiya-interior-wide.jpg",
-  cactus: "/images/rupiya-cactus-vibe.jpg",
+  logo: "/brand/rupiya-logo.jpg",
+  hero: "/images/rupiya-interior-hero.png",
+  seating: "/images/rupiya-interior-seating.png",
+  wide: "/images/rupiya-interior-wide.png",
+  cactus: "/images/rupiya-cactus-vibe.png",
 } as const;
 
 export const brandGallery = [
