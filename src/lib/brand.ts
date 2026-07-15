@@ -8,7 +8,7 @@ export const brandAssets = {
 
 export const brandGallery = [
   {
-    src: brandAssets.hero,
+    src: "/images/rupiya-interior-hero.png",
     altFa: "فضای داخلی روپیا با نور گرم و نشیمن لوکس",
     altEn: "RUPIYA interior with warm lighting and elegant seating",
   },

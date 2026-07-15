@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Locale } from "@/lib/i18n";
-import { formatPrice, publicCopy } from "@/lib/i18n";
+import { formatPrice, publicCopy, resolveLocale } from "@/lib/i18n";
 import type { PublicData } from "@/lib/data";
 
 type MenuCatalogProps = {
@@ -16,7 +16,8 @@ type ReservationFormProps = {
 };
 
 export function MenuCatalog({ locale, categories, items }: MenuCatalogProps) {
-  const t = publicCopy[locale].menu;
+  const safeLocale = resolveLocale(locale);
+  const t = publicCopy[safeLocale].menu;
   const [activeCategoryId, setActiveCategoryId] = useState<number | "all">("all");
 
   const filteredItems = useMemo(() => {
@@ -43,7 +44,7 @@ export function MenuCatalog({ locale, categories, items }: MenuCatalogProps) {
         </button>
 
         {categories.map((category) => {
-          const label = locale === "fa" ? category.nameFa : category.nameEn;
+          const label = safeLocale === "fa" ? category.nameFa : category.nameEn;
           const isActive = activeCategoryId === category.id;
 
           return (
@@ -69,9 +70,9 @@ export function MenuCatalog({ locale, categories, items }: MenuCatalogProps) {
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredItems.map((item) => {
             const category = categories.find((entry) => entry.id === item.categoryId);
-            const name = locale === "fa" ? item.nameFa : item.nameEn;
-            const altName = locale === "fa" ? item.nameEn : item.nameFa;
-            const description = locale === "fa" ? item.descriptionFa : item.descriptionEn;
+            const name = safeLocale === "fa" ? item.nameFa : item.nameEn;
+            const altName = safeLocale === "fa" ? item.nameEn : item.nameFa;
+            const description = safeLocale === "fa" ? item.descriptionFa : item.descriptionEn;
 
             return (
               <article key={item.id} className="surface-panel overflow-hidden rounded-[1.75rem]">
@@ -84,7 +85,7 @@ export function MenuCatalog({ locale, categories, items }: MenuCatalogProps) {
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_15%,rgba(11,9,9,0.82)_100%)]" />
                   <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
                     <span className="rounded-full border border-[#c7a94e55] bg-[#110f0edd] px-3 py-1 text-xs text-[#e5d5b6]">
-                      {locale === "fa" ? category?.nameFa : category?.nameEn}
+                      {safeLocale === "fa" ? category?.nameFa : category?.nameEn}
                     </span>
                     <span className={`rounded-full px-3 py-1 text-xs ${item.isAvailable ? "bg-[#89a86a] text-[#140f0f]" : "bg-[#3a2323] text-[#d8be9a]"}`}>
                       {item.isAvailable ? t.available : t.unavailable}
@@ -99,7 +100,7 @@ export function MenuCatalog({ locale, categories, items }: MenuCatalogProps) {
                         <p className="mt-1 text-xs uppercase tracking-[0.22em] text-[#8aa16a]">{altName}</p>
                       </div>
                       <div className="rounded-full border border-[#c7a94e44] bg-[#151110] px-3 py-2 text-sm text-[#e6d5b7]">
-                        {formatPrice(item.price, locale)} {t.currency}
+                        {formatPrice(item.price, safeLocale)} {t.currency}
                       </div>
                     </div>
                     <p className="mt-3 text-sm leading-7 text-[#bca98a]">{description}</p>
@@ -115,7 +116,8 @@ export function MenuCatalog({ locale, categories, items }: MenuCatalogProps) {
 }
 
 export function ReservationForm({ locale }: ReservationFormProps) {
-  const t = publicCopy[locale].reservation;
+  const safeLocale = resolveLocale(locale);
+  const t = publicCopy[safeLocale].reservation;
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({

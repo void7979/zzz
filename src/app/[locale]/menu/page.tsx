@@ -6,12 +6,13 @@ import { PublicSiteShell } from "@/components/public-site-shell";
 import { brandAssets } from "@/lib/brand";
 import { getPublicData } from "@/lib/data";
 import type { Locale } from "@/lib/i18n";
-import { publicCopy } from "@/lib/i18n";
+import { publicCopy, resolveLocale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function MenuPage({ params }: { params: Promise<{ locale: Locale }> }) {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const { categories, items, siteInfo } = await getPublicData();
   const t = publicCopy[locale];
   const directionBackIcon = locale === "fa" ? <ArrowLeft className="h-4 w-4 rotate-180" /> : <ArrowLeft className="h-4 w-4" />;

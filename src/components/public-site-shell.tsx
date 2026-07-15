@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AtSign, Clock3, MapPin, Phone } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
-import { publicCopy } from "@/lib/i18n";
+import { publicCopy, resolveLocale } from "@/lib/i18n";
 import type { PublicData } from "@/lib/data";
 import { brandAssets } from "@/lib/brand";
 
@@ -15,8 +15,9 @@ type Props = {
 };
 
 export function PublicSiteShell({ locale, currentPath, siteInfo, children }: Props) {
-  const t = publicCopy[locale];
-  const alternateLocale: Locale = locale === "fa" ? "en" : "fa";
+  const safeLocale = resolveLocale(locale);
+  const t = publicCopy[safeLocale];
+  const alternateLocale: Locale = safeLocale === "fa" ? "en" : "fa";
   const alternateHref = currentPath === "/menu" ? `/${alternateLocale}/menu` : `/${alternateLocale}`;
   const phones = [siteInfo.phonePrimary, siteInfo.phoneSecondary].filter(Boolean);
 
@@ -25,27 +26,27 @@ export function PublicSiteShell({ locale, currentPath, siteInfo, children }: Pro
       <div className="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(circle_at_top,rgba(199,169,78,0.08),transparent_58%)]" />
       <header className="sticky top-0 z-40 border-b border-[#c7a94e22] bg-[#0d0a0ae6] backdrop-blur-xl">
         <div className="container-shell flex flex-wrap items-center justify-between gap-4 py-3.5">
-          <Link href={`/${locale}`} className="group flex items-center gap-3">
+          <Link href={`/${safeLocale}`} className="group flex items-center gap-3">
             <div className="relative h-12 w-12 overflow-hidden rounded-full border border-[#c7a94e44] bg-black shadow-[0_8px_20px_rgba(0,0,0,0.28)]">
               <Image src={brandAssets.logo} alt="RUPIYA Café logo" fill sizes="48px" className="object-cover" priority />
             </div>
             <div>
               <p className="font-display text-2xl tracking-[0.22em] text-[#ead8b7]">RUPIYA</p>
-              <p className="text-xs tracking-[0.3em] text-[#8aa16a]">{locale === "fa" ? "روپیا کافه رستوران" : "CAFÉ & RESTAURANT"}</p>
+              <p className="text-xs tracking-[0.3em] text-[#8aa16a]">{safeLocale === "fa" ? "روپیا کافه رستوران" : "CAFÉ & RESTAURANT"}</p>
             </div>
           </Link>
 
           <nav className="hidden items-center gap-6 text-sm text-[#cfbc9c] md:flex">
-            <Link href={`/${locale}`} className="hover:text-[#e7d7bc]">
+            <Link href={`/${safeLocale}`} className="hover:text-[#e7d7bc]">
               {t.nav.home}
             </Link>
-            <Link href={`/${locale}/menu`} className="hover:text-[#8aa16a]">
+            <Link href={`/${safeLocale}/menu`} className="hover:text-[#8aa16a]">
               {t.nav.menu}
             </Link>
-            <Link href={`/${locale}#reservation`} className="hover:text-[#e7d7bc]">
+            <Link href={`/${safeLocale}#reservation`} className="hover:text-[#e7d7bc]">
               {t.nav.reservation}
             </Link>
-            <Link href={`/${locale}#location`} className="hover:text-[#e7d7bc]">
+            <Link href={`/${safeLocale}#location`} className="hover:text-[#e7d7bc]">
               {t.nav.location}
             </Link>
             <a href={siteInfo.instagramUrl} target="_blank" rel="noreferrer" className="hover:text-[#e7d7bc]">
@@ -76,7 +77,7 @@ export function PublicSiteShell({ locale, currentPath, siteInfo, children }: Pro
               </div>
             </div>
             <p className="max-w-xl text-sm leading-7 text-[#bca98a]">
-              {locale === "fa" ? siteInfo.taglineFa : siteInfo.taglineEn}
+              {safeLocale === "fa" ? siteInfo.taglineFa : siteInfo.taglineEn}
             </p>
             <p className="text-xs tracking-[0.2em] text-[#8aa16a]">{t.footer.rights}</p>
           </div>
@@ -84,7 +85,7 @@ export function PublicSiteShell({ locale, currentPath, siteInfo, children }: Pro
           <div className="space-y-3 text-sm text-[#cfbc9c]">
             <div className="flex items-center gap-2 text-[#e4d3b3]">
               <Clock3 className="h-4 w-4 text-[#c7a94e]" />
-              <span>{locale === "fa" ? siteInfo.hoursFa : siteInfo.hoursEn}</span>
+              <span>{safeLocale === "fa" ? siteInfo.hoursFa : siteInfo.hoursEn}</span>
             </div>
             {phones.map((phone) => (
               <a key={phone} href={`tel:${phone.replace(/-/g, "")}`} className="flex items-center gap-2 hover:text-[#e7d7bc]">
@@ -97,7 +98,7 @@ export function PublicSiteShell({ locale, currentPath, siteInfo, children }: Pro
           <div className="space-y-3 text-sm text-[#cfbc9c]">
             <div className="flex items-start gap-2">
               <MapPin className="mt-0.5 h-4 w-4 text-[#c7a94e]" />
-              <span>{locale === "fa" ? siteInfo.addressFa : siteInfo.addressEn}</span>
+              <span>{safeLocale === "fa" ? siteInfo.addressFa : siteInfo.addressEn}</span>
             </div>
             <a href={siteInfo.instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#e7d7bc]">
               <AtSign className="h-4 w-4 text-[#8aa16a]" />

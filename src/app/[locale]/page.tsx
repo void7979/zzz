@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, AtSign, Clock3, MapPin, PhoneCall } from "lucide-react";
 import { getPublicData } from "@/lib/data";
 import type { Locale } from "@/lib/i18n";
-import { formatPrice, publicCopy } from "@/lib/i18n";
+import { formatPrice, publicCopy, resolveLocale } from "@/lib/i18n";
 import { MenuCatalog, ReservationForm } from "@/components/public-interactive";
 import { PublicSiteShell } from "@/components/public-site-shell";
 import { brandAssets, brandGallery } from "@/lib/brand";
@@ -11,7 +11,8 @@ import { brandAssets, brandGallery } from "@/lib/brand";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: Locale }> }) {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const { categories, items, siteInfo, heroImageUrl } = await getPublicData();
   const t = publicCopy[locale];
   const phones = [siteInfo.phonePrimary, siteInfo.phoneSecondary];
