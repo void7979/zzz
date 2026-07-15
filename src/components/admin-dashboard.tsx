@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { upload } from "@vercel/blob/client";
 import { type FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -104,6 +105,11 @@ function createReservationDrafts(reservations: ReservationRecord[]): Reservation
   );
 }
 
+function getSafeUploadFileName(fileName: string) {
+  const cleanName = fileName.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+  return cleanName || "image";
+}
+
 async function getErrorMessage(response: Response, fallbackMessage: string) {
   const payload = (await response.json().catch(() => null)) as { error?: string } | null;
   return payload?.error || fallbackMessage;
@@ -138,6 +144,7 @@ export function AdminDashboard({ initialData, session }: Props) {
   const [feedback, setFeedback] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadFeedback, setUploadFeedback] = useState("");
   const [itemSearch, setItemSearch] = useState("");
   const [itemAvailabilityFilter, setItemAvailabilityFilter] = useState<"all" | "available" | "hidden">("all");
   const [itemCategoryFilter, setItemCategoryFilter] = useState<string>("all");
@@ -406,31 +413,26 @@ export function AdminDashboard({ initialData, session }: Props) {
   async function uploadImage(file: File): Promise<boolean> {
     setIsUploading(true);
     setFeedback("");
+    setUploadFeedback("در حال آپلود تصویر...");
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
+      const blob = await upload(`menu/${Date.now()}-${getSafeUploadFileName(file.name)}`, file, {
+        access: "public",
+        handleUploadUrl: "/api/admin/upload/client",
       });
 
-      if (!response.ok) {
-        throw new Error(await getErrorMessage(response, "آپلود تصویر ناموفق بود."));
-      }
-
-      const payload = (await response.json()) as { url: string };
-
-      if (!payload.url) {
+      if (!blob.url) {
         throw new Error("آدرس تصویر از سرور دریافت نشد.");
       }
 
-      setItemForm((current) => ({ ...current, imageUrl: payload.url }));
+      setItemForm((current) => ({ ...current, imageUrl: blob.url }));
       setFeedback("تصویر با موفقیت آپلود شد.");
+      setUploadFeedback(`تصویر آپلود شد: ${blob.url}`);
       return true;
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : "آپلود تصویر ناموفق بود.");
+      const message = error instanceof Error ? error.message : "آپلود تصویر ناموفق بود.";
+      setFeedback(message);
+      setUploadFeedback(message);
       return false;
     } finally {
       setIsUploading(false);
@@ -868,6 +870,7 @@ export function AdminDashboard({ initialData, session }: Props) {
                   }}
                 />
                 <span className="text-xs text-[#bca98a]">{isUploading ? "در حال آپلود..." : "پس از آپلود، آدرس تصویر به‌صورت خودکار ثبت می‌شود."}</span>
+                {uploadFeedback ? <span className="block text-xs text-[#d8c6a8]">{uploadFeedback}</span> : null}
               </label>
               {itemForm.imageUrl ? (
                 <div className="overflow-hidden rounded-[1.5rem] border border-[#c7a94e22] bg-[#110f0f]">
