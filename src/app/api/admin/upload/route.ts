@@ -1,62 +1,13 @@
-import { randomUUID } from "crypto";
-import { mkdir, writeFile, access } from "fs/promises";
-import { join } from "path";
 import { getAdminSession } from "@/lib/auth";
+import { saveUploadedImage } from "@/lib/uploaded-images";
 
 export const dynamic = "force-dynamic";
-
-function getExtension(fileName: string, mimeType: string) {
-  const fileExtension = fileName.split(".").pop()?.toLowerCase();
-
-  if (fileExtension) {
-    return fileExtension;
-  }
-
-  if (mimeType === "image/png") {
-    return "png";
-  }
-
-  if (mimeType === "image/webp") {
-    return "webp";
-  }
-
-  return "jpg";
-}
-
-async function isWritableDir(dir: string): Promise<boolean> {
-  try {
-    await access(dir);
-    return true;
-  } catch {
-    try {
-      await mkdir(dir, { recursive: true });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
 
   if (!session) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const isProduction = process.env.NODE_ENV === "production";
-  const uploadsDirectory = join(process.cwd(), "public", "uploads");
-  const uploadsWritable = !isProduction || (await isWritableDir(uploadsDirectory));
-
-  if (!uploadsWritable) {
-    return Response.json(
-      {
-        error:
-          "آپلود مستقیم فایل در این محیط در دسترس نیست. لطفاً از آدرس URL تصویر استفاده کنید. می‌توانید تصویر را در یک سرویس میزبانی تصویر (مانند Cloudinary یا Imgur) آپلود کرده و آدرس آن را اینجا قرار دهید.",
-        fallback: "use-url",
-      },
-      { status: 501 },
-    );
   }
 
   try {
@@ -75,12 +26,9 @@ export async function POST(request: Request) {
       return Response.json({ error: "حجم تصویر باید کمتر از ۵ مگابایت باشد." }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${Date.now()}-${randomUUID()}.${getExtension(file.name, file.type)}`;
+    const id = await saveUploadedImage(file);
 
-    await writeFile(join(uploadsDirectory, fileName), buffer);
-
-    return Response.json({ ok: true, url: `/uploads/${fileName}` });
+    return Response.json({ ok: true, url: `/api/images/${id}` });
   } catch {
     return Response.json({ error: "آپلود تصویر ناموفق بود." }, { status: 500 });
   }

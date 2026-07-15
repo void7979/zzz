@@ -272,6 +272,17 @@ async function ensureTables() {
     );
   `);
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS uploaded_images (
+      id VARCHAR(36) PRIMARY KEY,
+      file_name TEXT NOT NULL,
+      mime_type VARCHAR(100) NOT NULL,
+      data BYTEA NOT NULL,
+      size_bytes INTEGER NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `);
+
   await db.execute(sql`CREATE UNIQUE INDEX IF NOT EXISTS admins_username_idx ON admins (username);`);
 }
 

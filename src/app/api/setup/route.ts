@@ -53,7 +53,7 @@ async function listTables(): Promise<string[]> {
 }
 
 async function createTables(): Promise<string> {
-  const tables = ["categories", "menu_items", "reservations", "site_info", "admins"];
+  const tables = ["categories", "menu_items", "reservations", "site_info", "admins", "uploaded_images"];
   const existingTables = await listTables();
   const missing = tables.filter((table) => !existingTables.includes(table));
 
@@ -142,6 +142,19 @@ async function createTables(): Promise<string> {
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
       CREATE UNIQUE INDEX IF NOT EXISTS admins_username_idx ON admins (username);
+    `);
+  }
+
+  if (missing.includes("uploaded_images")) {
+    schemaStatements.push(`
+      CREATE TABLE IF NOT EXISTS uploaded_images (
+        id VARCHAR(36) PRIMARY KEY,
+        file_name TEXT NOT NULL,
+        mime_type VARCHAR(100) NOT NULL,
+        data BYTEA NOT NULL,
+        size_bytes INTEGER NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
     `);
   }
 

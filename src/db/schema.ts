@@ -1,5 +1,6 @@
 import {
   boolean,
+  customType,
   integer,
   pgTable,
   serial,
@@ -8,6 +9,12 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+
+const bytea = customType<{ data: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
@@ -78,8 +85,18 @@ export const admins = pgTable(
   }),
 );
 
+export const uploadedImages = pgTable("uploaded_images", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  fileName: text("file_name").notNull(),
+  mimeType: varchar("mime_type", { length: 100 }).notNull(),
+  data: bytea("data").notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type Category = typeof categories.$inferSelect;
 export type MenuItem = typeof menuItems.$inferSelect;
 export type Reservation = typeof reservations.$inferSelect;
 export type SiteInfo = typeof siteInfo.$inferSelect;
 export type Admin = typeof admins.$inferSelect;
+export type UploadedImage = typeof uploadedImages.$inferSelect;
