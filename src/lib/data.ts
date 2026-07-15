@@ -2,10 +2,9 @@ import { asc, count, desc, eq, sql } from "drizzle-orm";
 import { databaseProviderLabel, db } from "@/db";
 import { admins, categories, menuItems, reservations, siteInfo } from "@/db/schema";
 import { hashPassword } from "@/lib/auth";
-import { brandAssets } from "@/lib/brand";
 import type { ReservationStatus } from "@/lib/reservations";
 
-const heroImageUrl = brandAssets.hero;
+const heroImageUrl = "/images/rupiya-interior-hero.png";
 
 const sampleCategories = [
   { nameFa: "قهوه", nameEn: "Coffee", sortOrder: 1 },

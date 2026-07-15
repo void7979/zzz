@@ -4,7 +4,7 @@ import { getAdminSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-const maxImageSizeBytes = 20 * 1024 * 1024;
+const maxServerUploadSizeBytes = 4 * 1024 * 1024;
 
 function getSafeFileName(fileName: string) {
   const cleanName = fileName.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
@@ -30,8 +30,11 @@ export async function POST(request: Request) {
       return Response.json({ error: "فقط فایل تصویری مجاز است." }, { status: 400 });
     }
 
-    if (file.size > maxImageSizeBytes) {
-      return Response.json({ error: "حجم تصویر باید کمتر از ۲۰ مگابایت باشد." }, { status: 400 });
+    if (file.size > maxServerUploadSizeBytes) {
+      return Response.json(
+        { error: "برای فایل‌های بزرگ، صفحه ادمین باید از آپلود مستقیم Blob استفاده کند. لطفاً صفحه را refresh کنید و دوباره تلاش کنید." },
+        { status: 413 },
+      );
     }
 
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
