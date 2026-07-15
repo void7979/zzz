@@ -403,7 +403,7 @@ export function AdminDashboard({ initialData, session }: Props) {
     }
   }
 
-  async function uploadImage(file: File) {
+  async function uploadImage(file: File): Promise<boolean> {
     setIsUploading(true);
     setFeedback("");
 
@@ -421,10 +421,17 @@ export function AdminDashboard({ initialData, session }: Props) {
       }
 
       const payload = (await response.json()) as { url: string };
+
+      if (!payload.url) {
+        throw new Error("آدرس تصویر از سرور دریافت نشد.");
+      }
+
       setItemForm((current) => ({ ...current, imageUrl: payload.url }));
       setFeedback("تصویر با موفقیت آپلود شد.");
+      return true;
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : "آپلود تصویر ناموفق بود.");
+      return false;
     } finally {
       setIsUploading(false);
     }
@@ -853,8 +860,10 @@ export function AdminDashboard({ initialData, session }: Props) {
                   onChange={async (event) => {
                     const file = event.target.files?.[0];
                     if (file) {
-                      await uploadImage(file);
-                      event.currentTarget.value = "";
+                      const uploaded = await uploadImage(file);
+                      if (uploaded) {
+                        event.currentTarget.value = "";
+                      }
                     }
                   }}
                 />
@@ -876,7 +885,7 @@ export function AdminDashboard({ initialData, session }: Props) {
               </label>
             </div>
 
-            <button type="submit" disabled={isBusy || !data.categories.length} className="luxury-button mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-70">
+            <button type="submit" disabled={isBusy || isUploading || !data.categories.length} className="luxury-button mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-70">
               {itemForm.id ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
               {itemForm.id ? "ذخیره تغییرات آیتم" : "افزودن آیتم"}
             </button>

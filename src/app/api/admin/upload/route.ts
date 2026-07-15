@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { put } from "@vercel/blob";
 import { getAdminSession } from "@/lib/auth";
+import { saveUploadedImage } from "@/lib/uploaded-images";
 
 export const dynamic = "force-dynamic";
 
@@ -32,12 +33,16 @@ export async function POST(request: Request) {
       return Response.json({ error: "حجم تصویر باید کمتر از ۵ مگابایت باشد." }, { status: 400 });
     }
 
-    const blob = await put(`menu/${Date.now()}-${randomUUID()}-${getSafeFileName(file.name)}`, file, {
-      access: "public",
-    });
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      const id = await saveUploadedImage(file);
+      return Response.json({ ok: true, url: `/api/images/${id}` });
+    }
+
+    const blob = await put(`menu/${Date.now()}-${randomUUID()}-${getSafeFileName(file.name)}`, file, { access: "public" });
 
     return Response.json({ ok: true, url: blob.url });
-  } catch {
-    return Response.json({ error: "آپلود تصویر ناموفق بود." }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "آپلود تصویر ناموفق بود.";
+    return Response.json({ error: `آپلود تصویر ناموفق بود: ${message}` }, { status: 500 });
   }
 }
